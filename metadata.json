@@ -1,0 +1,6 @@
+{
+  "name": "Hotel Guest Request System",
+  "description": "Premium hotel guest request portal and staff ops dashboard for seamless room service management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

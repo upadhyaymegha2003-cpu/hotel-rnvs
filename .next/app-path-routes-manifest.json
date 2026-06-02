@@ -1,0 +1,11 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/requests/[id]/route": "/api/requests/[id]",
+  "/api/requests/mark-seen/route": "/api/requests/mark-seen",
+  "/api/requests/route": "/api/requests",
+  "/api/requests/stream/route": "/api/requests/stream",
+  "/page": "/",
+  "/room/[roomId]/page": "/room/[roomId]",
+  "/staff/page": "/staff"
+}
