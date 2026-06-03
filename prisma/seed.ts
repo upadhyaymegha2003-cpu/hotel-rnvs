@@ -30,10 +30,18 @@ async function main() {
     await prisma.request.create({
       data: {
         roomId: request.roomId,
-        itemsJson: JSON.stringify(request.items),
         customText: request.customText || null,
         status: request.status,
         createdAt: new Date(now - request.minutesAgo * 60 * 1000),
+        items: {
+          create: request.items.map((item) => ({
+            type: item.id,
+            emoji: item.emoji,
+            label: item.label,
+            description: item.description,
+          })),
+        },
+        auditLogs: { create: { action: "CREATED", actor: `seed:${request.roomId}` } },
       },
     });
   }

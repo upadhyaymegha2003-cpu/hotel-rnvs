@@ -1,4 +1,4 @@
-import type { Request } from "@prisma/client";
+import type { Prisma, RequestItem as PrismaRequestItem } from "@prisma/client";
 
 export interface RequestItem {
   id: string;
@@ -14,28 +14,38 @@ export interface RequestDto {
   customText?: string;
   status: string;
   seenByStaff: boolean;
+  assignedTo?: string;
+  version: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export function parseItems(itemsJson: string): RequestItem[] {
-  try {
-    const parsed = JSON.parse(itemsJson);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
+export const requestWithItems = {
+  items: true,
+} satisfies Prisma.RequestInclude;
 
-export function serializeRequest(request: Request): RequestDto {
+type RequestWithItems = Prisma.RequestGetPayload<{ include: typeof requestWithItems }>;
+
+export function serializeRequest(request: RequestWithItems): RequestDto {
   return {
     id: request.id,
     roomId: request.roomId,
-    items: parseItems(request.itemsJson),
+    items: request.items.map(serializeItem),
     customText: request.customText || undefined,
     status: request.status,
     seenByStaff: request.seenByStaff,
+    assignedTo: request.assignedTo || undefined,
+    version: request.version,
     createdAt: request.createdAt.toISOString(),
     updatedAt: request.updatedAt.toISOString(),
+  };
+}
+
+function serializeItem(item: PrismaRequestItem): RequestItem {
+  return {
+    id: item.type,
+    emoji: item.emoji,
+    label: item.label,
+    description: item.description,
   };
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Crown, Key, Shield, ArrowRight } from "lucide-react";
+import { Crown, Key, Shield, ArrowRight, QrCode, ScanLine } from "lucide-react";
 
 export default function HotelHub() {
   const [roomInput, setRoomInput] = useState("204");
@@ -110,6 +110,28 @@ export default function HotelHub() {
                 Enter your physical room ID (e.g. 204, 302, 105) to test multi-room updates dynamic synced flows.
               </p>
             </form>
+
+            <div className="bg-[#FAF8F5] border border-[#EAE6DD] rounded-xl p-3 flex gap-3 items-center">
+              <div className="bg-white border border-[#EAE6DD] rounded-lg p-1.5 shrink-0">
+                <img src="/api/qr/room/204" alt="QR code for room 204" className="w-20 h-20" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 text-[#8C763F]">
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Room 204 QR</span>
+                </div>
+                <p className="text-[10px] text-gray-500 mt-1 leading-snug">
+                  Scan this QR or open the scanner to simulate the in-room QR workflow.
+                </p>
+                <Link
+                  href="/scan"
+                  className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-700 hover:text-[#C9A84C]"
+                >
+                  <ScanLine className="w-3.5 h-3.5" />
+                  Open QR Scanner
+                </Link>
+              </div>
+            </div>
 
             <div className="h-[1px] bg-[#EAE6DD]" />
 

@@ -16,4 +16,6 @@ export interface GuestRequest {
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
   seenByStaff: boolean;
+  assignedTo?: string;
+  version: number;
 }

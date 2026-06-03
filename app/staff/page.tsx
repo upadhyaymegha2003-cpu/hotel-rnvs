@@ -20,6 +20,10 @@ import {
 import { GuestRequest, RequestStatus } from "@/src/types";
 
 export default function StaffDashboard() {
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [username, setUsername] = useState("concierge");
+  const [password, setPassword] = useState("concierge-demo");
+  const [loginError, setLoginError] = useState("");
   const [requests, setRequests] = useState<GuestRequest[]>([]);
   const [activeFilter, setActiveFilter] = useState<"ALL" | "PENDING" | "ACTIVE" | "DONE">("ALL");
   const [selectedFloor, setSelectedFloor] = useState<string>("ALL");
@@ -33,6 +37,10 @@ export default function StaffDashboard() {
   const fetchRequests = async () => {
     try {
       const res = await fetch("/api/requests");
+      if (res.status === 401) {
+        setAuthenticated(false);
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setRequests(data);
@@ -45,6 +53,13 @@ export default function StaffDashboard() {
   };
 
   useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => setAuthenticated(res.ok))
+      .catch(() => setAuthenticated(false));
+  }, []);
+
+  useEffect(() => {
+    if (!authenticated) return;
     fetchRequests();
 
     // Set interactive initial time safe for SSR hydration
@@ -109,7 +124,22 @@ export default function StaffDashboard() {
       clearInterval(clockTimer);
       eventSource.close();
     };
-  }, []);
+  }, [authenticated]);
+
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setLoginError("");
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    if (!response.ok) {
+      setLoginError("Invalid staff credentials");
+      return;
+    }
+    setAuthenticated(true);
+  };
 
   // Handler: Update request status
   const handleUpdateStatus = async (id: string, currentStatus: RequestStatus) => {
@@ -205,6 +235,27 @@ export default function StaffDashboard() {
     const elapsedMinutes = Math.floor(elapsedMs / (1000 * 60));
     return elapsedMinutes >= 15; // Overdue alert if pending for longer than 15 minutes
   };
+
+  if (authenticated === null) {
+    return <div className="min-h-screen bg-slate-50" />;
+  }
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex items-center justify-center p-4">
+        <form onSubmit={handleLogin} className="w-full max-w-sm bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-4">
+          <div>
+            <h1 className="text-lg font-bold text-slate-900">Staff Operations Login</h1>
+            <p className="text-xs text-slate-400 mt-1">Authorized concierge staff only.</p>
+          </div>
+          <input value={username} onChange={(event) => setUsername(event.target.value)} className="w-full border border-slate-200 rounded-lg p-2.5 text-sm" placeholder="Username" />
+          <input value={password} onChange={(event) => setPassword(event.target.value)} className="w-full border border-slate-200 rounded-lg p-2.5 text-sm" placeholder="Password" type="password" />
+          {loginError && <p className="text-xs text-rose-600">{loginError}</p>}
+          <button className="w-full bg-slate-900 text-white rounded-lg p-2.5 text-sm font-bold" type="submit">Access Dashboard</button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col md:flex-row antialiased relative">
@@ -531,7 +582,7 @@ export default function StaffDashboard() {
                       ) : (
                         <div className="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
                           <Check className="w-3.5 h-3.5 text-slate-400" />
-                          Seen by desk
+                          {req.assignedTo ? `Owned by ${req.assignedTo}` : "Seen by desk"}
                         </div>
                       )}
 

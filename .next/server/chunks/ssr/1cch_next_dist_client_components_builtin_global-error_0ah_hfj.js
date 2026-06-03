@@ -1,3 +1,0 @@
-module.exports=[88503,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(15792);a.n(d("[project]/Downloads/hotel-guest-request-system/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},59091,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(15792);a.n(d("[project]/Downloads/hotel-guest-request-system/node_modules/next/dist/client/components/builtin/global-error.js"))},15985,a=>{"use strict";a.i(88503);var b=a.i(59091);a.n(b)},5569,a=>{a.n(a.i(15985))}];
-
-//# sourceMappingURL=1cch_next_dist_client_components_builtin_global-error_0ah_hfj.js.map

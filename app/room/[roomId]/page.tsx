@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import {
   PenTool,
   Clock,
@@ -11,9 +11,17 @@ import {
   Crown,
   Send,
   Loader2,
-  Undo2
+  Undo2,
+  UserRound
 } from "lucide-react";
 import { RequestItem, GuestRequest, RequestStatus } from "@/src/types";
+
+interface CheckedInGuest {
+  roomId: string;
+  guestName: string;
+  reservationCode: string;
+  checkoutDate: string;
+}
 
 // Standard request items as requested
 const STANDARD_ITEMS: RequestItem[] = [
@@ -27,24 +35,43 @@ const STANDARD_ITEMS: RequestItem[] = [
 
 export default function GuestScreen() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const roomId = (params?.roomId as string) || "204";
+  const roomToken = searchParams.get("token");
 
   // State managers
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [customText, setCustomText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedRequest, setSubmittedRequest] = useState<GuestRequest | null>(null);
+  const [checkedInGuest, setCheckedInGuest] = useState<CheckedInGuest | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    fetch(`/api/rooms/${encodeURIComponent(roomId)}`)
+      .then((response) => response.json())
+      .then(setCheckedInGuest)
+      .catch(() =>
+        setCheckedInGuest({
+          roomId,
+          guestName: "Checked-in Guest",
+          reservationCode: `GS-${roomId}`,
+          checkoutDate: "2026-06-07",
+        })
+      );
+  }, [roomId]);
+
   // Connection for SSE live-sync updates
   useEffect(() => {
     if (!submittedRequest) return;
 
-    const eventSource = new EventSource("/api/requests/stream");
+    const eventSource = new EventSource(
+      `/api/requests/stream?roomId=${encodeURIComponent(roomId)}${roomToken ? `&token=${encodeURIComponent(roomToken)}` : ""}`
+    );
 
     eventSource.onmessage = (event) => {
       try {
@@ -60,7 +87,7 @@ export default function GuestScreen() {
     return () => {
       eventSource.close();
     };
-  }, [submittedRequest?.id]);
+  }, [roomId, roomToken, submittedRequest?.id]);
 
   const handleCardClick = (id: string) => {
     if (selectedIds.includes(id)) {
@@ -101,6 +128,7 @@ export default function GuestScreen() {
           roomId,
           items: chosenItems,
           customText: isCustomSelected ? customText : undefined,
+          roomToken,
         }),
       });
 
@@ -184,6 +212,24 @@ export default function GuestScreen() {
             <div className="bg-[#FAF8F5] border border-[#EAE6DD] text-[#8C763F] font-semibold text-xs py-1 px-3 rounded-full shadow-inner flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse" />
               Room {roomId}
+            </div>
+          </div>
+
+          <div className="mt-4 bg-white border border-[#EAE6DD] rounded-xl p-3 flex items-center gap-3 shadow-sm">
+            <div className="w-9 h-9 rounded-lg bg-[#1E293B] text-white flex items-center justify-center shrink-0">
+              <UserRound className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">
+                Checked-in guest
+              </p>
+              <p className="text-sm font-bold text-[#1C1917] truncate">
+                {checkedInGuest?.guestName || "Loading guest..."}
+              </p>
+              <p className="text-[10px] text-gray-400 font-mono">
+                Room {roomId}
+                {checkedInGuest?.reservationCode ? ` · ${checkedInGuest.reservationCode}` : ""}
+              </p>
             </div>
           </div>
 

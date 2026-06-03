@@ -1,3 +1,0 @@
-module.exports=[5837,a=>{"use strict";var b=a.i(91520);a.s(["default",0,function({children:a}){return(0,b.jsxs)("html",{lang:"en",children:[(0,b.jsx)("head",{children:(0,b.jsx)("link",{href:"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap",rel:"stylesheet"})}),(0,b.jsx)("body",{className:"antialiased",children:a})]})},"metadata",0,{title:"Hotel-RMNVS",description:"Premium hotel guest request portal and staff ops dashboard for seamless room service management."}])},26502,a=>{a.n(a.i(5837))}];
-
-//# sourceMappingURL=Downloads_hotel-guest-request-system_app_layout_tsx_0zib7y4._.js.map

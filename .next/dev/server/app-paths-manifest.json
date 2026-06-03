@@ -1,8 +1,0 @@
-{
-  "/api/requests/[id]/route": "app/api/requests/[id]/route.js",
-  "/api/requests/route": "app/api/requests/route.js",
-  "/api/requests/stream/route": "app/api/requests/stream/route.js",
-  "/page": "app/page.js",
-  "/room/[roomId]/page": "app/room/[roomId]/page.js",
-  "/staff/page": "app/staff/page.js"
-}
